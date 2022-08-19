@@ -17,13 +17,13 @@ class PlaywrightEngine {
     return async function scenario(initialContext, cb) {
       events.emit("started");
       const browser = await chromium.launch({
-        //headless:
-        //self.config.engines.playwright.headless === false ? false : true,
-        headless: false,
+        headless:
+          self.config.engines.playwright.headless === false ? false : true,
+        //headless: false,
         ignoreDefaultArgs: ["--mute-audio"],
         args: [
           "--enable-precise-memory-info",
-          "--no-sandbox",
+          //"--no-sandbox",
           "--autoplay-policy=no-user-gesture-required",
           "--use-fake-ui-for-media-stream",
           "--use-fake-device-for-media-stream",
