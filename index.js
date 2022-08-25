@@ -16,28 +16,35 @@ class PlaywrightEngine {
     const self = this;
     return async function scenario(initialContext, cb) {
       events.emit("started");
-      const browser = await chromium.launch({
-        headless:
-          self.config.engines.playwright.headless === false ? false : true,
-        //headless: false,
-        ignoreDefaultArgs: ["--mute-audio"],
-        args: [
+
+      let args = ["--enable-precise-memory-info"];
+      if (self.config.engines.playwright.fakeMic) {
+        args = [
           "--enable-precise-memory-info",
-          //"--no-sandbox",
           "--autoplay-policy=no-user-gesture-required",
           "--use-fake-ui-for-media-stream",
           "--use-fake-device-for-media-stream",
           "--use-file-for-fake-audio-capture=" +
             __dirname +
             "/PinkPanther30.wav",
-        ],
+        ];
+      }
+
+      const browser = await chromium.launch({
+        headless:
+          self.config.engines.playwright.headless === false ? false : true,
+        ignoreDefaultArgs: ["--mute-audio"],
+        args: args,
       });
       debug("browser created");
       const context = await browser.newContext({
         permissions: ["microphone"],
       });
 
-      await context.grantPermissions(["microphone"]);
+      if (self.config.engines.playwright.fakeMic) {
+        await context.grantPermissions(["microphone"]);
+      }
+
       debug("context created");
       const uniquePageLoadToTiming = {};
       try {
